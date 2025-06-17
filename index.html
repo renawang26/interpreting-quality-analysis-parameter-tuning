@@ -310,30 +310,6 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
         
-        .download-info {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(52, 152, 219, 0.9);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            z-index: 1000;
-            animation: slideIn 0.5s ease;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
         @media (max-width: 1200px) {
             .content-area {
                 grid-template-columns: 1fr;
@@ -482,7 +458,7 @@
                 
                 <div class="control-section">
                     <div class="control-title">
-                        💾 Export & Download
+                        💾 Export Options
                     </div>
                     <button class="control-btn secondary" onclick="downloadPlot('png')" aria-label="Download PNG">
                         📷 Download PNG (High Res)
@@ -493,16 +469,9 @@
                     <button class="control-btn secondary" onclick="downloadPlot('pdf')" aria-label="Download PDF">
                         📄 Download PDF
                     </button>
-                    <button class="control-btn accent" onclick="downloadHTML()" aria-label="Save complete HTML">
-                        💻 Save Complete HTML
-                    </button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="download-info" id="downloadInfo" style="display: none;">
-        📥 Download ready! Check your Downloads folder.
     </div>
 
     <script>
@@ -544,7 +513,7 @@
                 mode: 'markers+text',
                 type: 'scatter3d',
                 marker: {
-                    size: clusterData.sizes.map(s => Math.sqrt(s) * 1.2),
+                    size: clusterData.sizes.map(s => Math.sqrt(s) * 1.5),
                     color: clusterData.colors,
                     line: {color: '#2c3e50', width: 3},
                     opacity: 0.9,
@@ -554,7 +523,7 @@
                     `<b>${name}</b><br>n=${clusterData.sizes[i]} (${clusterData.percentages[i]}%)`
                 ),
                 textposition: 'top center',
-                textfont: {size: 12, color: '#2c3e50', family: 'Arial Black'},
+                textfont: {size: 14, color: '#2c3e50', family: 'Arial Black'},
                 hovertemplate: 
                     '<b>%{text}</b><br><br>' +
                     '<b>Quality Scores:</b><br>' +
@@ -705,7 +674,7 @@
             });
             
             const size = clusterData.sizes.map((s, i) => {
-                const baseSize = Math.sqrt(s) * 1.2;
+                const baseSize = Math.sqrt(s) * 1.5;
                 if (clusterIndex === -1) return baseSize;
                 return i === clusterIndex ? baseSize * 1.4 : baseSize * 0.6;
             });
@@ -763,31 +732,8 @@
             };
             
             Plotly.downloadImage('main3dPlot', config).then(() => {
-                showDownloadNotification();
+                console.log('Download completed');
             });
-        }
-
-        function downloadHTML() {
-            const timestamp = new Date().toISOString().split('T')[0];
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `interactive_quality_clustering_optimized_${timestamp}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showDownloadNotification();
-        }
-
-        function showDownloadNotification() {
-            const notification = document.getElementById('downloadInfo');
-            notification.style.display = 'block';
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
         }
 
         function toggleFullscreen() {
