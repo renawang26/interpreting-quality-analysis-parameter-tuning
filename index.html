@@ -372,7 +372,8 @@
                         • <strong>Pan:</strong> Shift + click and drag to pan<br>
                         • <strong>Reset:</strong> Double-click plot to reset view<br>
                         • <strong>Info:</strong> Hover over clusters for detailed information<br>
-                        • <strong>Focus:</strong> Use buttons below to highlight specific clusters
+                        • <strong>Focus:</strong> Use buttons below to highlight specific clusters<br>
+                        • <strong>Clear stuck tooltips:</strong> Press C or Escape key
                     </div>
                 </div>
                 
@@ -621,7 +622,10 @@
                 
                 const plotElement = document.getElementById('main3dPlot');
                 
+                let hoverTimeout;
+                
                 plotElement.on('plotly_hover', function(data) {
+                    clearTimeout(hoverTimeout);
                     const pointIndex = data.points[0].pointNumber;
                     const update = {
                         'marker.line.width': clusterData.names.map((_, i) => 
@@ -635,11 +639,20 @@
                 });
                 
                 plotElement.on('plotly_unhover', function() {
-                    const update = {
-                        'marker.line.width': clusterData.names.map(() => 3),
-                        'marker.opacity': clusterData.names.map(() => 0.9)
-                    };
-                    Plotly.restyle('main3dPlot', update, 0);
+                    clearTimeout(hoverTimeout);
+                    hoverTimeout = setTimeout(() => {
+                        const update = {
+                            'marker.line.width': clusterData.names.map(() => 3),
+                            'marker.opacity': clusterData.names.map(() => 0.9)
+                        };
+                        Plotly.restyle('main3dPlot', update, 0);
+                    }, 50);
+                });
+                
+                // Clear any stuck tooltips on click
+                plotElement.on('plotly_click', function() {
+                    clearTimeout(hoverTimeout);
+                    Plotly.Fx.hover('main3dPlot', []);
                 });
             }).catch(error => {
                 console.error('Error initializing plot:', error);
@@ -774,6 +787,12 @@
                         clearInterval(rotationInterval);
                         rotationInterval = null;
                     }
+                    // Clear any stuck tooltips
+                    Plotly.Fx.hover('main3dPlot', []);
+                    break;
+                case 'c': case 'C':
+                    // Clear tooltips with C key
+                    Plotly.Fx.hover('main3dPlot', []);
                     break;
             }
         });
