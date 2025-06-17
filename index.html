@@ -528,11 +528,14 @@
                 hovertemplate: 
                     '<b>%{text}</b><br><br>' +
                     '<b>Quality Scores:</b><br>' +
-                    '📊 Fidelity: %{x:.1f}/100<br>' +
-                    '🎭 Delivery: %{y:.1f}/100<br>' +
-                    '📝 Language: %{z:.1f}/100<br><br>' +
-                    '<b>Metrics:</b><br>' +
-                    '👥 Size: ' + clusterData.sizes + ' interpreters<br>' +
+                    '📊 Information Fidelity: %{x:.1f}/100<br>' +
+                    '🎭 Delivery Quality: %{y:.1f}/100<br>' +
+                    '📝 Target-Language Quality: %{z:.1f}/100<br><br>' +
+                    '<b>Cluster Metrics:</b><br>' +
+                    '🔍 Silhouette Score: ' + clusterData.silhouette.map(s => s.toFixed(2)) + '<br>' +
+                    '👥 Sample Size: ' + clusterData.sizes + ' interpreters<br><br>' +
+                    '<b>Profile Description:</b><br>' +
+                    '<i>' + clusterData.descriptions + '</i><br>' +
                     '<extra></extra>',
                 name: 'Quality Clusters'
             }];
@@ -540,9 +543,9 @@
             const layout = {
                 title: {
                     text: '<b>Six Distinct Quality Profiles in Interpreting Performance</b><br><sub style="font-size: 10px;">Interactive 3D Clustering • N = 1,805 • K-means (k=6)</sub>',
-                    font: {size: 13, color: '#2c3e50', family: 'Segoe UI'},
+                    font: {size: 14, color: '#2c3e50', family: 'Segoe UI'},
                     x: 0.5,
-                    y: 0.985
+                    y: 0.995
                 },
                 scene: {
                     xaxis: {
@@ -586,7 +589,7 @@
                     aspectmode: 'cube'
                 },
                 font: {family: 'Segoe UI, Arial', size: 12},
-                margin: {l: 0, r: 0, t: 25, b: 0},
+                margin: {l: 0, r: 0, t: 15, b: 0},
                 paper_bgcolor: '#fafbfc',
                 plot_bgcolor: '#fafbfc',
                 showlegend: false
