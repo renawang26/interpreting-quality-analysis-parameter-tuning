@@ -3,10 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Interactive 3D Plot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .download-container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            font-weight: 600;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(39, 174, 96, 0.4);
+        }
+        
+        .download-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .instructions ol {
+            color: #5a6c7d;
+            line-height: 1.8;
+        }
+        
+        .features {
+            background: linear-gradient(135deg, #e8f8f5 0%, #d5f4e6 100%);
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .features h3 {
+            color: #27ae60;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .features ul {
+            color: #2c5530;
+            line-height: 1.8;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            color: #856404;
+        }
+        
+        .file-info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="download-container">
+        <div class="title">📥 Download Your Optimized 3D Plot</div>
+        <div class="subtitle">
+            Interactive 3D Quality Clustering Analysis<br>
+            <strong>Optimized for Maximum Bubble Visibility</strong>
+        </div>
+        
+        <button class="download-btn" onclick="downloadOptimizedHTML()">
+            📊 Download Interactive HTML File
+        </button>
+        
+        <div class="file-info">
+            <strong>📁 File Details:</strong><br>
+            • <strong>Name:</strong> interactive_quality_clustering_optimized.html<br>
+            • <strong>Size:</strong> ~85KB (self-contained)<br>
+            • <strong>Features:</strong> Fully interactive 3D visualization<br>
+            • <strong>Compatibility:</strong> All modern browsers
+        </div>
+        
+        <div class="features">
+            <h3>✨ What's Optimized:</h3>
+            <ul>
+                <li><strong>Maximized Plot Area:</strong> 80% of screen width</li>
+                <li><strong>Larger Bubbles:</strong> Increased marker size for visibility</li>
+                <li><strong>Minimal Header:</strong> Reduced padding and margins</li>
+                <li><strong>Compact Layout:</strong> Maximum space for your data</li>
+                <li><strong>Perfect for Presentations:</strong> Ideal for academic conferences</li>
+            </ul>
+        </div>
+        
+        <div class="instructions">
+            <h3>🚀 Upload to GitHub Pages:</h3>
+            <ol>
+                <li>Download the file using the button above</li>
+                <li>Go to your GitHub repository</li>
+                <li>Click on your existing HTML file (probably "index.html")</li>
+                <li>Click the pencil icon (✏️) to edit</li>
+                <li>Select all content (Ctrl+A) and delete</li>
+                <li>Open the downloaded file in a text editor</li>
+                <li>Copy all content and paste into GitHub</li>
+                <li>Scroll down and click "Commit changes"</li>
+                <li>Wait 2-3 minutes for GitHub Pages to update</li>
+            </ol>
+        </div>
+        
+        <div class="warning">
+            <strong>💡 Quick Test:</strong> After downloading, double-click the HTML file to open it in your browser and verify the bubbles are clearly visible before uploading to GitHub.
+        </div>
+        
+        <button class="download-btn" onclick="downloadOptimizedHTML()" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); margin-top: 20px;">
+            🔄 Download Again
+        </button>
+    </div>
+
+    <script>
+        function downloadOptimizedHTML() {
+            // The complete optimized HTML content
+            const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive 3D Quality Clustering Analysis</title>
     <meta name="description" content="Machine Learning Models for Automated Assessment of Interpreting Quality - Interactive 3D Clustering Visualization">
     <meta name="author" content="Interpreting Quality Research">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"><\/script>
     <style>
         * {
             margin: 0;
@@ -27,8 +211,8 @@
             display: flex;
             flex-direction: column;
             background: white;
-            margin: 15px;
-            border-radius: 20px;
+            margin: 8px;
+            border-radius: 15px;
             box-shadow: 0 25px 80px rgba(0,0,0,0.3);
             overflow: hidden;
         }
@@ -36,7 +220,7 @@
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            padding: 15px 40px;
+            padding: 8px 30px;
             position: relative;
             overflow: hidden;
         }
@@ -58,16 +242,16 @@
         }
         
         .title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             position: relative;
             z-index: 2;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .subtitle {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.95;
             font-weight: 300;
             position: relative;
@@ -77,7 +261,7 @@
         .content-area {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 320px;
+            grid-template-columns: 1fr 280px;
             gap: 0;
             position: relative;
             background: #fafbfc;
@@ -506,7 +690,6 @@
     </div>
 
     <script>
-        // Research data - Six distinct quality profiles from K-means clustering
         const clusterData = {
             names: [
                 'Critical Issues', 
@@ -526,7 +709,6 @@
             ],
             sizes: [201, 25, 186, 435, 538, 420],
             percentages: [11.1, 1.4, 10.3, 24.1, 29.8, 23.3],
-            // Quality scores based on empirical clustering analysis
             fidelity: [0.5, 3.9, 45.6, 63.7, 75.0, 84.0],
             delivery: [0.2, 78.7, 71.8, 74.1, 79.7, 84.4],
             language: [0.4, 8.7, 47.4, 62.6, 74.4, 83.3],
@@ -546,14 +728,14 @@
                 mode: 'markers+text',
                 type: 'scatter3d',
                 marker: {
-                    size: clusterData.sizes.map(s => Math.sqrt(s) * 0.9),
+                    size: clusterData.sizes.map(s => Math.sqrt(s) * 1.2),
                     color: clusterData.colors,
                     line: {color: '#2c3e50', width: 3},
                     opacity: 0.9,
                     sizemode: 'diameter'
                 },
                 text: clusterData.names.map((name, i) => 
-                    `<b>${name}</b><br>n=${clusterData.sizes[i]} (${clusterData.percentages[i]}%)`
+                    \`<b>\${name}</b><br>n=\${clusterData.sizes[i]} (\${clusterData.percentages[i]}%)\`
                 ),
                 textposition: 'top center',
                 textfont: {size: 12, color: '#2c3e50', family: 'Arial Black'},
@@ -574,10 +756,10 @@
 
             const layout = {
                 title: {
-                    text: '<b>Six Distinct Quality Profiles in Interpreting Performance</b><br><sub style="font-size: 11px;">Interactive 3D Clustering Analysis • N = 1,805 • K-means (k=6) • Silhouette = 0.647</sub>',
-                    font: {size: 16, color: '#2c3e50', family: 'Segoe UI'},
+                    text: '<b>Six Distinct Quality Profiles in Interpreting Performance</b><br><sub style="font-size: 10px;">Interactive 3D Clustering • N = 1,805 • K-means (k=6)</sub>',
+                    font: {size: 14, color: '#2c3e50', family: 'Segoe UI'},
                     x: 0.5,
-                    y: 0.99
+                    y: 0.995
                 },
                 scene: {
                     xaxis: {
@@ -621,7 +803,7 @@
                     aspectmode: 'cube'
                 },
                 font: {family: 'Segoe UI, Arial', size: 12},
-                margin: {l: 0, r: 0, t: 40, b: 0},
+                margin: {l: 0, r: 0, t: 15, b: 0},
                 paper_bgcolor: '#fafbfc',
                 plot_bgcolor: '#fafbfc',
                 showlegend: false
@@ -647,13 +829,11 @@
             };
 
             Plotly.newPlot('main3dPlot', traces, layout, config).then(() => {
-                // Hide loading overlay with smooth transition
                 setTimeout(() => {
                     document.getElementById('loadingOverlay').classList.add('hidden');
                     plotInitialized = true;
                 }, 1000);
                 
-                // Add custom interaction handlers
                 const plotElement = document.getElementById('main3dPlot');
                 
                 plotElement.on('plotly_hover', function(data) {
@@ -704,12 +884,12 @@
             currentHighlight = clusterIndex;
             
             const opacity = clusterData.names.map((_, i) => {
-                if (clusterIndex === -1) return 0.9; // Show all
+                if (clusterIndex === -1) return 0.9;
                 return i === clusterIndex ? 1.0 : 0.2;
             });
             
             const size = clusterData.sizes.map((s, i) => {
-                const baseSize = Math.sqrt(s) * 0.9;
+                const baseSize = Math.sqrt(s) * 1.2;
                 if (clusterIndex === -1) return baseSize;
                 return i === clusterIndex ? baseSize * 1.4 : baseSize * 0.6;
             });
@@ -756,7 +936,7 @@
             if (!plotInitialized) return;
             
             const timestamp = new Date().toISOString().split('T')[0];
-            const filename = `interpreting_quality_clustering_3d_${timestamp}`;
+            const filename = \`interpreting_quality_clustering_3d_\${timestamp}\`;
             
             const config = {
                 format: format,
@@ -778,7 +958,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `interactive_quality_clustering_${timestamp}.html`;
+            a.download = \`interactive_quality_clustering_optimized_\${timestamp}.html\`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -804,12 +984,10 @@
             }
         }
 
-        // Initialize the visualization when page loads
         window.addEventListener('load', () => {
             setTimeout(createInteractivePlot, 500);
         });
 
-        // Handle fullscreen changes
         document.addEventListener('fullscreenchange', () => {
             setTimeout(() => {
                 if (plotInitialized) {
@@ -818,7 +996,6 @@
             }, 100);
         });
 
-        // Keyboard shortcuts for presentation control
         document.addEventListener('keydown', (e) => {
             if (!plotInitialized) return;
             
@@ -839,7 +1016,6 @@
             }
         });
 
-        // Handle window resize
         window.addEventListener('resize', () => {
             if (plotInitialized) {
                 setTimeout(() => {
@@ -848,12 +1024,29 @@
             }
         });
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (rotationInterval) {
                 clearInterval(rotationInterval);
             }
         });
+    <\/script>
+</body>
+</html>`;
+
+            // Create and download the file
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'interactive_quality_clustering_optimized.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Show success message
+            alert('📥 Download started! The optimized HTML file should be in your Downloads folder.\n\nNext steps:\n1. Test the file by double-clicking it\n2. Upload to GitHub to replace your old version\n3. Enjoy the larger, more visible bubbles!');
+        }
     </script>
 </body>
 </html>
