@@ -36,7 +36,7 @@
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            padding: 20px 40px;
+            padding: 15px 40px;
             position: relative;
             overflow: hidden;
         }
@@ -58,16 +58,16 @@
         }
         
         .title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             position: relative;
             z-index: 2;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .subtitle {
-            font-size: 16px;
+            font-size: 14px;
             opacity: 0.95;
             font-weight: 300;
             position: relative;
@@ -408,7 +408,7 @@
                         🏠 Default View
                     </button>
                     <button class="control-btn" onclick="setView('top')" aria-label="Top view">
-                       ⬆️ Top View (Bird's Eye)
+                        ⬆️ Top View (Bird's Eye)
                     </button>
                     <button class="control-btn" onclick="setView('side')" aria-label="Side view">
                         ➡️ Side View (Profile)
@@ -574,10 +574,10 @@
 
             const layout = {
                 title: {
-                    text: '<b>Six Distinct Quality Profiles in Interpreting Performance</b><br><sub style="font-size: 12px;">Interactive 3D Clustering Analysis • N = 1,805 • K-means (k=6) • Silhouette = 0.647</sub>',
-                    font: {size: 18, color: '#2c3e50', family: 'Segoe UI'},
+                    text: '<b>Six Distinct Quality Profiles in Interpreting Performance</b><br><sub style="font-size: 11px;">Interactive 3D Clustering Analysis • N = 1,805 • K-means (k=6) • Silhouette = 0.647</sub>',
+                    font: {size: 16, color: '#2c3e50', family: 'Segoe UI'},
                     x: 0.5,
-                    y: 0.98
+                    y: 0.99
                 },
                 scene: {
                     xaxis: {
@@ -621,7 +621,7 @@
                     aspectmode: 'cube'
                 },
                 font: {family: 'Segoe UI, Arial', size: 12},
-                margin: {l: 0, r: 0, t: 60, b: 0},
+                margin: {l: 0, r: 0, t: 40, b: 0},
                 paper_bgcolor: '#fafbfc',
                 plot_bgcolor: '#fafbfc',
                 showlegend: false
