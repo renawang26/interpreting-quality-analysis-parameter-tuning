@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Quality Clustering Analysis</title>
+    <meta name="description" content="Machine Learning Models for Automated Assessment of Interpreting Quality - Interactive 3D Clustering Visualization">
+    <meta name="author" content="Interpreting Quality Research">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2c3e50;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            margin: 15px;
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 4s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(0%); }
+        }
+        
+        .title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.95;
+            font-weight: 300;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .content-area {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 0;
+            position: relative;
+            background: #fafbfc;
+        }
+        
+        .plot-container {
+            position: relative;
+            background: #fafbfc;
+            border-right: 3px solid #ecf0f1;
+        }
+        
+        .control-panel {
+            background: linear-gradient(180deg, #f8f9fa 0%, #ecf0f1 100%);
+            padding: 35px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            overflow-y: auto;
+            border-radius: 0 0 20px 0;
+        }
+        
+        .control-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e3e8ee;
+            transition: all 0.3s ease;
+        }
+        
+        .control-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        
+        .control-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        
+        .control-btn {
+            width: 100%;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: none;
+        }
+        
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .control-btn:hover::before {
+            left: 100%;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .control-btn:active {
+            transform: translateY(0);
+        }
+        
+        .control-btn.secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+        
+        .control-btn.accent {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .control-btn.success {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+        
+        .cluster-info {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #5a6c7d;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .cluster-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+        
+        .stat-item {
+            background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdb 100%);
+            padding: 12px 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            border: 1px solid #bdc3c7;
+        }
+        
+        .stat-item:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .instructions {
+            background: linear-gradient(135deg, #e8f8f5 0%, #d5f4e6 100%);
+            border: 2px solid #27ae60;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .instructions-title {
+            font-weight: 700;
+            font-size: 16px;
+            color: #27ae60;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .instructions-list {
+            font-size: 13px;
+            color: #2c5530;
+            line-height: 1.6;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #3498db;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #ecf0f1;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fullscreen-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 5;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .fullscreen-btn:hover {
+            background: white;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        
+        .download-info {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .content-area {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto;
+            }
+            
+            .control-panel {
+                max-height: 200px;
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .control-section {
+                min-width: 250px;
+                flex-shrink: 0;
+            }
+        }
+        
+        @media print {
+            .control-panel {
+                display: none;
+            }
+            
+            .content-area {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="header">
+            <div class="title">Interactive 3D Quality Clustering Analysis</div>
+            <div class="subtitle">Machine Learning Models for Automated Assessment of Interpreting Quality</div>
+        </div>
+        
+        <div class="content-area">
+            <div class="plot-container">
+                <div id="main3dPlot" style="width: 100%; height: 100%;"></div>
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="spinner"></div>
+                    <div>Initializing Interactive 3D Visualization...</div>
+                    <div style="font-size: 14px; margin-top: 10px; opacity: 0.7;">Loading cluster data and rendering controls</div>
+                </div>
+                <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+                    ⛶
+                </button>
+            </div>
+            
+            <div class="control-panel">
+                <div class="instructions">
+                    <div class="instructions-title">
+                        🎯 Interactive Exploration Guide
+                    </div>
+                    <div class="instructions-list">
+                        • <strong>Rotate:</strong> Click and drag to rotate the 3D view<br>
+                        • <strong>Zoom:</strong> Mouse wheel or pinch to zoom in/out<br>
+                        • <strong>Pan:</strong> Shift + click and drag to pan<br>
+                        • <strong>Reset:</strong> Double-click plot to reset view<br>
+                        • <strong>Info:</strong> Hover over clusters for detailed information<br>
+                        • <strong>Focus:</strong> Use buttons below to highlight specific clusters
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <div class="control-title">
+                        📐 Viewing Perspectives
+                    </div>
+                    <button class="control-btn" onclick="setView('default')" aria-label="Default view">
+                        🏠 Default View
+                    </button>
+                    <button class="control-btn" onclick="setView('top')" aria-label="Top view">
+                        ⬆️ Top View (Bird's Eye)
+                    </button>
+                    <button class="control-btn" onclick="setView('side')" aria-label="Side view">
+                        ➡️ Side View (Profile)
+                    </button>
+                    <button class="control-btn" onclick="setView('corner')" aria-label="Corner view">
+                        📐 Corner View (Perspective)
+                    </button>
+                    <button class="control-btn accent" onclick="startAutoRotate()" aria-label="Auto rotate">
+                        🔄 Auto Rotate
+                    </button>
+                </div>
+                
+                <div class="control-section">
+                    <div class="control-title">
+                        🎭 Cluster Focus & Analysis
+                    </div>
+                    <button class="control-btn success" onclick="highlightCluster(-1)" aria-label="Show all clusters">
+                        👁️ Show All Clusters
+                    </button>
+                    <button class="control-btn" onclick="highlightCluster(0)" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);" aria-label="Critical Issues cluster">
+                        🔴 Critical Issues (11.1%)
+                    </button>
+                    <button class="control-btn" onclick="highlightCluster(1)" style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);" aria-label="Delivery-Dominant cluster">
+                        🟡 Delivery-Dominant (1.4%)
+                    </button>
+                    <button class="control-btn" onclick="highlightCluster(2)" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);" aria-label="Below Standard cluster">
+                        🟠 Below Standard (10.3%)
+                    </button>
+                    <button class="control-btn" onclick="highlightCluster(3)" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);" aria-label="Acceptable cluster">
+                        🔵 Acceptable (24.1%)
+                    </button>
+                    <button class="control-btn" onclick="highlightCluster(4)" style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);" aria-label="Good Quality cluster">
+                        🟢 Good Quality (29.8%)
+                    </button>
+                    <button class="control-btn" onclick="highlightCluster(5)" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);" aria-label="Excellent cluster">
+                        🟣 Excellent (23.3%)
+                    </button>
+                </div>
+                
+                <div class="control-section">
+                    <div class="control-title">
+                        📊 Research Statistics
+                    </div>
+                    <div class="cluster-info">
+                        <strong>Dataset Overview:</strong><br>
+                        • Total Samples: N = 1,805 interpreting segments<br>
+                        • Clustering Method: K-means algorithm (k=6)<br>
+                        • Validation: Silhouette coefficient = 0.647<br>
+                        • Quality Dimensions: 3 (Fidelity, Delivery, Language)<br>
+                        • ML Features: 42 automated assessment parameters
+                    </div>
+                    <div class="cluster-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">65.6%</span>
+                            <span class="stat-label">Delivery-Dominant</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">34.4%</span>
+                            <span class="stat-label">Balanced Profiles</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">53.1%</span>
+                            <span class="stat-label">Good+ Quality</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">11.1%</span>
+                            <span class="stat-label">Need Intervention</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-section">
+                    <div class="control-title">
+                        💾 Export & Download
+                    </div>
+                    <button class="control-btn secondary" onclick="downloadPlot('png')" aria-label="Download PNG">
+                        📷 Download PNG (High Res)
+                    </button>
+                    <button class="control-btn secondary" onclick="downloadPlot('svg')" aria-label="Download SVG">
+                        🎨 Download SVG (Vector)
+                    </button>
+                    <button class="control-btn secondary" onclick="downloadPlot('pdf')" aria-label="Download PDF">
+                        📄 Download PDF
+                    </button>
+                    <button class="control-btn accent" onclick="downloadHTML()" aria-label="Save complete HTML">
+                        💻 Save Complete HTML
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="download-info" id="downloadInfo" style="display: none;">
+        📥 Download ready! Check your Downloads folder.
+    </div>
+
+    <script>
+        // Research data - Six distinct quality profiles from K-means clustering
+        const clusterData = {
+            names: [
+                'Critical Issues', 
+                'Delivery-Dominant', 
+                'Below Standard', 
+                'Acceptable Quality', 
+                'Good Quality', 
+                'Excellent Performance'
+            ],
+            descriptions: [
+                'Uniformly low performance across all dimensions requiring immediate comprehensive intervention and foundational skill development',
+                'Exceptional delivery skills (78.7) with significantly weak content accuracy and language performance - suggests strong presentation abilities but content/linguistic gaps',
+                'Below-average performance with systematic delivery advantages over content accuracy - represents developing interpreters with performance-focused training',
+                'Professional-level delivery quality with acceptable supporting dimensions - represents competent interpreters meeting basic professional standards',
+                'High-quality delivery performance with strong overall quality across dimensions - represents skilled professional interpreters',
+                'Excellent balanced performance across all quality dimensions - represents expert-level interpreters with mastery across all skill areas'
+            ],
+            sizes: [201, 25, 186, 435, 538, 420],
+            percentages: [11.1, 1.4, 10.3, 24.1, 29.8, 23.3],
+            // Quality scores based on empirical clustering analysis
+            fidelity: [0.5, 3.9, 45.6, 63.7, 75.0, 84.0],
+            delivery: [0.2, 78.7, 71.8, 74.1, 79.7, 84.4],
+            language: [0.4, 8.7, 47.4, 62.6, 74.4, 83.3],
+            colors: ['#e74c3c', '#f39c12', '#e67e22', '#3498db', '#2ecc71', '#9b59b6'],
+            silhouette: [0.84, 0.71, 0.58, 0.63, 0.69, 0.72]
+        };
+
+        let currentHighlight = -1;
+        let rotationInterval = null;
+        let plotInitialized = false;
+
+        function createInteractivePlot() {
+            const traces = [{
+                x: clusterData.fidelity,
+                y: clusterData.delivery,
+                z: clusterData.language,
+                mode: 'markers+text',
+                type: 'scatter3d',
+                marker: {
+                    size: clusterData.sizes.map(s => Math.sqrt(s) * 0.9),
+                    color: clusterData.colors,
+                    line: {color: '#2c3e50', width: 3},
+                    opacity: 0.9,
+                    sizemode: 'diameter'
+                },
+                text: clusterData.names.map((name, i) => 
+                    `<b>${name}</b><br>n=${clusterData.sizes[i]} (${clusterData.percentages[i]}%)`
+                ),
+                textposition: 'top center',
+                textfont: {size: 12, color: '#2c3e50', family: 'Arial Black'},
+                hovertemplate: 
+                    '<b>%{text}</b><br><br>' +
+                    '<b>Quality Scores:</b><br>' +
+                    '📊 Information Fidelity: %{x:.1f}/100<br>' +
+                    '🎭 Delivery Quality: %{y:.1f}/100<br>' +
+                    '📝 Target-Language Quality: %{z:.1f}/100<br><br>' +
+                    '<b>Cluster Metrics:</b><br>' +
+                    '🔍 Silhouette Score: ' + clusterData.silhouette.map(s => s.toFixed(2)) + '<br>' +
+                    '👥 Sample Size: ' + clusterData.sizes + ' interpreters<br><br>' +
+                    '<b>Profile Description:</b><br>' +
+                    '<i>' + clusterData.descriptions + '</i><br>' +
+                    '<extra></extra>',
+                name: 'Quality Clusters'
+            }];
+
+            const layout = {
+                title: {
+                    text: '<b>Six Distinct Quality Profiles in Interpreting Performance</b><br><sub style="font-size: 14px;">Interactive 3D Clustering Analysis • N = 1,805 • K-means (k=6) • Silhouette = 0.647</sub>',
+                    font: {size: 22, color: '#2c3e50', family: 'Segoe UI'},
+                    x: 0.5,
+                    y: 0.95
+                },
+                scene: {
+                    xaxis: {
+                        title: {
+                            text: '<b>Information Fidelity</b><br><i style="font-size: 12px;">Content Accuracy & Completeness</i>',
+                            font: {size: 16, color: '#2c3e50'}
+                        },
+                        range: [-8, 95],
+                        tickfont: {size: 13, color: '#34495e'},
+                        gridcolor: '#bdc3c7',
+                        gridwidth: 2,
+                        showspikes: false
+                    },
+                    yaxis: {
+                        title: {
+                            text: '<b>Delivery Quality</b><br><i style="font-size: 12px;">Fluency & Performance</i>',
+                            font: {size: 16, color: '#2c3e50'}
+                        },
+                        range: [-8, 95],
+                        tickfont: {size: 13, color: '#34495e'},
+                        gridcolor: '#bdc3c7',
+                        gridwidth: 2,
+                        showspikes: false
+                    },
+                    zaxis: {
+                        title: {
+                            text: '<b>Target-Language Quality</b><br><i style="font-size: 12px;">Linguistic Competence</i>',
+                            font: {size: 16, color: '#2c3e50'}
+                        },
+                        range: [-8, 95],
+                        tickfont: {size: 13, color: '#34495e'},
+                        gridcolor: '#bdc3c7',
+                        gridwidth: 2,
+                        showspikes: false
+                    },
+                    camera: {
+                        eye: {x: 1.8, y: 1.8, z: 1.8},
+                        center: {x: 0, y: 0, z: 0}
+                    },
+                    bgcolor: '#fafbfc',
+                    aspectmode: 'cube'
+                },
+                font: {family: 'Segoe UI, Arial', size: 13},
+                margin: {l: 0, r: 0, t: 100, b: 0},
+                paper_bgcolor: '#fafbfc',
+                plot_bgcolor: '#fafbfc',
+                showlegend: false
+            };
+
+            const config = {
+                displayModeBar: true,
+                displaylogo: false,
+                modeBarButtonsToRemove: ['pan2d', 'select2d', 'lasso2d', 'autoScale2d', 'tableRotation', 'resetCameraLastSave3d'],
+                modeBarButtonsToAdd: [{
+                    name: 'Download High-Res PNG',
+                    icon: Plotly.Icons.camera,
+                    click: () => downloadPlot('png')
+                }],
+                responsive: true,
+                toImageButtonOptions: {
+                    format: 'png',
+                    filename: 'interpreting_quality_clustering_3d',
+                    height: 1000,
+                    width: 1400,
+                    scale: 2
+                }
+            };
+
+            Plotly.newPlot('main3dPlot', traces, layout, config).then(() => {
+                // Hide loading overlay with smooth transition
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').classList.add('hidden');
+                    plotInitialized = true;
+                }, 1000);
+                
+                // Add custom interaction handlers
+                const plotElement = document.getElementById('main3dPlot');
+                
+                plotElement.on('plotly_hover', function(data) {
+                    const pointIndex = data.points[0].pointNumber;
+                    const update = {
+                        'marker.line.width': clusterData.names.map((_, i) => 
+                            i === pointIndex ? 6 : 3
+                        ),
+                        'marker.opacity': clusterData.names.map((_, i) => 
+                            i === pointIndex ? 1.0 : 0.8
+                        )
+                    };
+                    Plotly.restyle('main3dPlot', update, 0);
+                });
+                
+                plotElement.on('plotly_unhover', function() {
+                    const update = {
+                        'marker.line.width': clusterData.names.map(() => 3),
+                        'marker.opacity': clusterData.names.map(() => 0.9)
+                    };
+                    Plotly.restyle('main3dPlot', update, 0);
+                });
+            }).catch(error => {
+                console.error('Error initializing plot:', error);
+                document.getElementById('loadingOverlay').innerHTML = 
+                    '<div style="color: #e74c3c;">❌ Error loading visualization. Please refresh the page.</div>';
+            });
+        }
+
+        function setView(viewType) {
+            if (!plotInitialized) return;
+            
+            const cameras = {
+                default: {eye: {x: 1.8, y: 1.8, z: 1.8}, center: {x: 0, y: 0, z: 0}},
+                top: {eye: {x: 0, y: 0, z: 2.8}, center: {x: 0, y: 0, z: 0}},
+                side: {eye: {x: 2.8, y: 0, z: 0}, center: {x: 0, y: 0, z: 0}},
+                corner: {eye: {x: 2.4, y: 2.4, z: 1.6}, center: {x: 0, y: 0, z: 0}}
+            };
+            
+            Plotly.relayout('main3dPlot', {
+                'scene.camera': cameras[viewType]
+            });
+        }
+
+        function highlightCluster(clusterIndex) {
+            if (!plotInitialized) return;
+            
+            currentHighlight = clusterIndex;
+            
+            const opacity = clusterData.names.map((_, i) => {
+                if (clusterIndex === -1) return 0.9; // Show all
+                return i === clusterIndex ? 1.0 : 0.2;
+            });
+            
+            const size = clusterData.sizes.map((s, i) => {
+                const baseSize = Math.sqrt(s) * 0.9;
+                if (clusterIndex === -1) return baseSize;
+                return i === clusterIndex ? baseSize * 1.4 : baseSize * 0.6;
+            });
+            
+            const lineWidth = clusterData.names.map((_, i) => {
+                if (clusterIndex === -1) return 3;
+                return i === clusterIndex ? 6 : 1;
+            });
+            
+            const update = {
+                'marker.opacity': [opacity],
+                'marker.size': [size],
+                'marker.line.width': [lineWidth]
+            };
+            
+            Plotly.restyle('main3dPlot', update, 0);
+        }
+
+        function startAutoRotate() {
+            if (!plotInitialized) return;
+            
+            if (rotationInterval) {
+                clearInterval(rotationInterval);
+                rotationInterval = null;
+                return;
+            }
+            
+            let angle = 0;
+            rotationInterval = setInterval(() => {
+                angle += 1.2;
+                const camera = {
+                    eye: {
+                        x: 2.5 * Math.cos(angle * Math.PI / 180),
+                        y: 2.5 * Math.sin(angle * Math.PI / 180),
+                        z: 1.6
+                    },
+                    center: {x: 0, y: 0, z: 0}
+                };
+                Plotly.relayout('main3dPlot', {'scene.camera': camera});
+            }, 80);
+        }
+
+        function downloadPlot(format) {
+            if (!plotInitialized) return;
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            const filename = `interpreting_quality_clustering_3d_${timestamp}`;
+            
+            const config = {
+                format: format,
+                filename: filename,
+                width: format === 'png' ? 1600 : 1400,
+                height: format === 'png' ? 1200 : 1000,
+                scale: format === 'png' ? 3 : 2
+            };
+            
+            Plotly.downloadImage('main3dPlot', config).then(() => {
+                showDownloadNotification();
+            });
+        }
+
+        function downloadHTML() {
+            const timestamp = new Date().toISOString().split('T')[0];
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `interactive_quality_clustering_${timestamp}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showDownloadNotification();
+        }
+
+        function showDownloadNotification() {
+            const notification = document.getElementById('downloadInfo');
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Fullscreen not supported:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Initialize the visualization when page loads
+        window.addEventListener('load', () => {
+            setTimeout(createInteractivePlot, 500);
+        });
+
+        // Handle fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            setTimeout(() => {
+                if (plotInitialized) {
+                    Plotly.Plots.resize('main3dPlot');
+                }
+            }, 100);
+        });
+
+        // Keyboard shortcuts for presentation control
+        document.addEventListener('keydown', (e) => {
+            if (!plotInitialized) return;
+            
+            switch(e.key) {
+                case '1': setView('default'); break;
+                case '2': setView('top'); break;
+                case '3': setView('side'); break;
+                case '4': setView('corner'); break;
+                case 'r': case 'R': startAutoRotate(); break;
+                case 'f': case 'F': toggleFullscreen(); break;
+                case 'h': case 'H': highlightCluster(-1); break;
+                case 'Escape': 
+                    if (rotationInterval) {
+                        clearInterval(rotationInterval);
+                        rotationInterval = null;
+                    }
+                    break;
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (plotInitialized) {
+                setTimeout(() => {
+                    Plotly.Plots.resize('main3dPlot');
+                }, 100);
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (rotationInterval) {
+                clearInterval(rotationInterval);
+            }
+        });
+    </script>
+</body>
+</html>
