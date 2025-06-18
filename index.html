@@ -90,6 +90,8 @@
             border-right: 3px solid #ecf0f1;
             /* Ensure plot container captures mouse events properly */
             z-index: 1;
+            /* Add padding to prevent overlap with header */
+            padding-top: 30px;
         }
         
         /* Fix for plot interaction */
@@ -374,7 +376,7 @@
         
         <div class="content-area">
             <div class="plot-container">
-                <div id="main3dPlot" style="width: 100%; height: 100%;"></div>
+                <div id="main3dPlot" style="width: 100%; height: calc(100% - 30px);"></div>
                 <div class="loading-overlay" id="loadingOverlay">
                     <div class="spinner"></div>
                     <div>Initializing Interactive 3D Visualization...</div>
@@ -588,7 +590,7 @@
                     text: '<b>Six Distinct Quality Profiles in Interpreting Performance</b><br><sub style="font-size: 10px;">Interactive 3D Clustering • N = 1,805 • K-means (k=6)</sub>',
                     font: {size: 14, color: '#2c3e50', family: 'Segoe UI'},
                     x: 0.5,
-                    y: 0.98
+                    y: 0.95
                 },
                 scene: {
                     xaxis: {
