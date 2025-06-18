@@ -88,6 +88,13 @@
             position: relative;
             background: #fafbfc;
             border-right: 3px solid #ecf0f1;
+            /* Ensure plot container captures mouse events properly */
+            z-index: 1;
+        }
+        
+        /* Fix for plot interaction */
+        .plot-container .js-plotly-plot {
+            pointer-events: auto !important;
         }
         
         .control-panel {
@@ -99,6 +106,9 @@
             overflow-y: auto;
             border-radius: 0 0 20px 0;
             max-height: 100%;
+            /* Prevent control panel from interfering with plot */
+            z-index: 2;
+            position: relative;
         }
         
         .control-section {
@@ -310,6 +320,20 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
         
+        /* Debug helper */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+        }
+        
         @media (max-width: 1200px) {
             .content-area {
                 grid-template-columns: 1fr;
@@ -475,6 +499,13 @@
         </div>
     </div>
 
+    <!-- Debug info -->
+    <div class="debug-info" id="debugInfo">
+        Plot Status: <span id="plotStatus">Loading...</span><br>
+        Mouse Events: <span id="mouseEvents">Active</span><br>
+        Last Action: <span id="lastAction">None</span>
+    </div>
+
     <script>
         const clusterData = {
             names: [
@@ -505,8 +536,20 @@
         let currentHighlight = -1;
         let rotationInterval = null;
         let plotInitialized = false;
+        let hoverTimeout = null;
+
+        // Debug functions
+        function updateDebugInfo(status, action) {
+            const debugDiv = document.getElementById('debugInfo');
+            if (debugDiv) {
+                document.getElementById('plotStatus').textContent = status;
+                document.getElementById('lastAction').textContent = action;
+            }
+        }
 
         function createInteractivePlot() {
+            updateDebugInfo('Initializing...', 'Creating plot traces');
+            
             const traces = [{
                 x: clusterData.fidelity,
                 y: clusterData.delivery,
@@ -614,19 +657,32 @@
                 }
             };
 
+            updateDebugInfo('Creating plot...', 'Plotly.newPlot');
+
             Plotly.newPlot('main3dPlot', traces, layout, config).then(() => {
+                updateDebugInfo('Setting up interactions...', 'Plot created successfully');
+                
                 setTimeout(() => {
                     document.getElementById('loadingOverlay').classList.add('hidden');
                     plotInitialized = true;
+                    updateDebugInfo('Ready', 'Plot fully initialized');
+                    
+                    // Force a resize to ensure proper dimensions
+                    setTimeout(() => {
+                        Plotly.Plots.resize('main3dPlot');
+                        updateDebugInfo('Ready', 'Plot resized');
+                    }, 100);
                 }, 1000);
                 
                 const plotElement = document.getElementById('main3dPlot');
                 
-                let hoverTimeout;
-                
+                // Enhanced event handling
                 plotElement.on('plotly_hover', function(data) {
-                    clearTimeout(hoverTimeout);
+                    if (hoverTimeout) clearTimeout(hoverTimeout);
+                    
                     const pointIndex = data.points[0].pointNumber;
+                    updateDebugInfo('Ready', `Hovering cluster ${pointIndex}`);
+                    
                     const update = {
                         'marker.line.width': clusterData.names.map((_, i) => 
                             i === pointIndex ? 6 : 3
@@ -639,8 +695,10 @@
                 });
                 
                 plotElement.on('plotly_unhover', function() {
-                    clearTimeout(hoverTimeout);
+                    if (hoverTimeout) clearTimeout(hoverTimeout);
+                    
                     hoverTimeout = setTimeout(() => {
+                        updateDebugInfo('Ready', 'Unhovered');
                         const update = {
                             'marker.line.width': clusterData.names.map(() => 3),
                             'marker.opacity': clusterData.names.map(() => 0.9)
@@ -651,18 +709,31 @@
                 
                 // Clear any stuck tooltips on click
                 plotElement.on('plotly_click', function() {
-                    clearTimeout(hoverTimeout);
+                    if (hoverTimeout) clearTimeout(hoverTimeout);
+                    updateDebugInfo('Ready', 'Plot clicked');
                     Plotly.Fx.hover('main3dPlot', []);
                 });
+
+                // Monitor for interaction issues
+                plotElement.on('plotly_relayout', function(eventdata) {
+                    updateDebugInfo('Ready', 'View changed');
+                });
+
             }).catch(error => {
                 console.error('Error initializing plot:', error);
+                updateDebugInfo('Error', error.message);
                 document.getElementById('loadingOverlay').innerHTML = 
                     '<div style="color: #e74c3c;">❌ Error loading visualization. Please refresh the page.</div>';
             });
         }
 
         function setView(viewType) {
-            if (!plotInitialized) return;
+            if (!plotInitialized) {
+                updateDebugInfo('Not Ready', 'View change attempted too early');
+                return;
+            }
+            
+            updateDebugInfo('Ready', `Setting ${viewType} view`);
             
             const cameras = {
                 default: {eye: {x: 1.8, y: 1.8, z: 1.8}, center: {x: 0, y: 0, z: 0}},
@@ -677,9 +748,13 @@
         }
 
         function highlightCluster(clusterIndex) {
-            if (!plotInitialized) return;
+            if (!plotInitialized) {
+                updateDebugInfo('Not Ready', 'Highlight attempted too early');
+                return;
+            }
             
             currentHighlight = clusterIndex;
+            updateDebugInfo('Ready', `Highlighting cluster ${clusterIndex}`);
             
             const opacity = clusterData.names.map((_, i) => {
                 if (clusterIndex === -1) return 0.9;
@@ -707,14 +782,19 @@
         }
 
         function startAutoRotate() {
-            if (!plotInitialized) return;
+            if (!plotInitialized) {
+                updateDebugInfo('Not Ready', 'Auto-rotate attempted too early');
+                return;
+            }
             
             if (rotationInterval) {
                 clearInterval(rotationInterval);
                 rotationInterval = null;
+                updateDebugInfo('Ready', 'Auto-rotate stopped');
                 return;
             }
             
+            updateDebugInfo('Ready', 'Auto-rotate started');
             let angle = 0;
             rotationInterval = setInterval(() => {
                 angle += 1.2;
@@ -733,6 +813,7 @@
         function downloadPlot(format) {
             if (!plotInitialized) return;
             
+            updateDebugInfo('Ready', `Downloading ${format}`);
             const timestamp = new Date().toISOString().split('T')[0];
             const filename = `interpreting_quality_clustering_3d_${timestamp}`;
             
@@ -745,7 +826,7 @@
             };
             
             Plotly.downloadImage('main3dPlot', config).then(() => {
-                console.log('Download completed');
+                updateDebugInfo('Ready', 'Download completed');
             });
         }
 
@@ -759,7 +840,9 @@
             }
         }
 
+        // Enhanced initialization
         window.addEventListener('load', () => {
+            updateDebugInfo('Loading...', 'Window loaded');
             setTimeout(createInteractivePlot, 500);
         });
 
@@ -767,6 +850,7 @@
             setTimeout(() => {
                 if (plotInitialized) {
                     Plotly.Plots.resize('main3dPlot');
+                    updateDebugInfo('Ready', 'Fullscreen toggled');
                 }
             }, 100);
         });
@@ -782,6 +866,11 @@
                 case 'r': case 'R': startAutoRotate(); break;
                 case 'f': case 'F': toggleFullscreen(); break;
                 case 'h': case 'H': highlightCluster(-1); break;
+                case 'd': case 'D': 
+                    // Toggle debug info
+                    const debugDiv = document.getElementById('debugInfo');
+                    debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
+                    break;
                 case 'Escape': 
                     if (rotationInterval) {
                         clearInterval(rotationInterval);
@@ -789,10 +878,12 @@
                     }
                     // Clear any stuck tooltips
                     Plotly.Fx.hover('main3dPlot', []);
+                    updateDebugInfo('Ready', 'Escaped/Reset');
                     break;
                 case 'c': case 'C':
                     // Clear tooltips with C key
                     Plotly.Fx.hover('main3dPlot', []);
+                    updateDebugInfo('Ready', 'Tooltips cleared');
                     break;
             }
         });
@@ -801,6 +892,7 @@
             if (plotInitialized) {
                 setTimeout(() => {
                     Plotly.Plots.resize('main3dPlot');
+                    updateDebugInfo('Ready', 'Window resized');
                 }, 100);
             }
         });
@@ -809,6 +901,15 @@
             if (rotationInterval) {
                 clearInterval(rotationInterval);
             }
+        });
+
+        // Additional debugging - check if plot container is receiving events
+        document.getElementById('main3dPlot').addEventListener('mousedown', function(e) {
+            updateDebugInfo('Ready', 'Mouse down on plot');
+        });
+
+        document.getElementById('main3dPlot').addEventListener('mousemove', function(e) {
+            document.getElementById('mouseEvents').textContent = `Active (${e.clientX}, ${e.clientY})`;
         });
     </script>
 </body>
